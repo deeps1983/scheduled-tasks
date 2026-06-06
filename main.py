@@ -1,38 +1,73 @@
-# To run and test the code you need to update 4 places:
-# 1. Change MY_EMAIL/MY_PASSWORD to your own details.
-# 2. Go to your email provider and make it allow less secure apps.
-# 3. Update the SMTP ADDRESS to match your email provider.
-# 4. Update birthdays.csv to contain today's month and day.
-# See the solution video in the 100 Days of Python Course for explainations.
-
-
-from datetime import datetime
-import pandas
-import random
-import smtplib
 import os
+from pathlib import Path
+import requests
+from twilio.rest import Client
+from dotenv import load_dotenv
 
-# import os and use it to get the Github repository secrets
-MY_EMAIL = os.environ.get("MY_EMAIL")
-MY_PASSWORD = os.environ.get("MY_PASSWORD")
+# Load .env from the same directory as this script, regardless of where it's run from
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 
-today = datetime.now()
-today_tuple = (today.month, today.day)
+api_key = os.getenv("OWM_API_KEY")
+own_endpoint= "https://api.openweathermap.org/data/2.5/forecast"
+account_sid = os.getenv("TW_ACCOUNT_SID")
+auth_token = os.getenv("TW_AUTH_TOKEN")
+twilio_from = os.getenv("TW_FROM_NUMBER")
+twilio_to = os.getenv("TW_TO_NUMBER")
 
-data = pandas.read_csv("birthdays.csv")
-birthdays_dict = {(data_row["month"], data_row["day"])                  : data_row for (index, data_row) in data.iterrows()}
-if today_tuple in birthdays_dict:
-    birthday_person = birthdays_dict[today_tuple]
-    file_path = f"letter_templates/letter_{random.randint(1, 3)}.txt"
-    with open(file_path) as letter_file:
-        contents = letter_file.read()
-        contents = contents.replace("[NAME]", birthday_person["name"])
+# Validate before using any credentials
+if not api_key or not auth_token or not account_sid or not twilio_from or not twilio_to:
+    raise ValueError("Missing required environment variables: OWM_API_KEY, TW_ACCOUNT_SID, TW_AUTH_TOKEN, TW_FROM_NUMBER, TW_TO_NUMBER")
 
-    with smtplib.SMTP("YOUR EMAIL PROVIDER SMTP SERVER ADDRESS") as connection:
-        connection.starttls()
-        connection.login(MY_EMAIL, MY_PASSWORD)
-        connection.sendmail(
-            from_addr=MY_EMAIL,
-            to_addrs=birthday_person["email"],
-            msg=f"Subject:Happy Birthday!\n\n{contents}"
-        )
+client = Client(account_sid, auth_token)
+
+weather_param = {
+ "lat" : "-26.120136",
+ "lon" : "27.901464",
+ "appid" : api_key, 
+ "units" : "metric",
+ "cnt" : "8"
+}
+    
+#calling OpenWeatherMap API
+response = requests.get(own_endpoint, params=weather_param)
+print(f"response code={response.status_code}")  
+#print(response.json())  
+weather_data = response.json()
+
+will_rain = False
+for hour_data in weather_data['list']:
+#     print(weather_data['list'][0]['weather'][0]['id'])
+        print(hour_data['weather'][0]['id'])
+        hour_data_id = hour_data['weather'][0]['id']
+        if int(hour_data_id) < 700:
+            will_rain = True
+
+if will_rain:
+    print("bring an umbrella")
+    message = client.messages.create(
+        body="It will rain today. Remember to bring an umbrella ☂️",
+        from_=twilio_from,
+        to=twilio_to
+    )
+else:
+    print("no rain today")
+    message = client.messages.create(
+        body="no rain today🌞....enjoy your day!",
+        from_=twilio_from,
+        to=twilio_to
+    )
+    print(message.status)
+
+
+
+
+
+
+    
+
+
+
+
+
+
+    
