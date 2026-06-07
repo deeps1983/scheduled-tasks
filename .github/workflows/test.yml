@@ -23,25 +23,52 @@ jobs:
 
       - name: Check secrets are configured
         env:
-          MY_EMAIL: ${{ secrets.MY_EMAIL }}
-          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+          OWM_API_KEY: ${{ secrets.OWM_API_KEY }}
+          TW_ACCOUNT_SID: ${{ secrets.TW_ACCOUNT_SID }}
+          TW_AUTH_TOKEN: ${{ secrets.TW_AUTH_TOKEN }}
+          TW_FROM_NUMBER: ${{ secrets.TW_FROM_NUMBER}}
+          TW_TO_NUMBER: ${{ secrets.TW_TO_NUMBER}}
         run: |
-          if [ -z "$MY_EMAIL" ]; then
-            echo "MY_EMAIL secret is not set!"
+          if [ -z "$OWM_API_KEY" ]; then
+            echo "OWM_API_KEY secret is not set!"
             echo "Go to Settings > Secrets > Actions and add it."
             exit 1
           else
-            echo "MY_EMAIL is configured"
+            echo "OWM_API_KEY is configured"
           fi
 
-          if [ -z "$MY_PASSWORD" ]; then
-            echo "MY_PASSWORD secret is not set!"
+          if [ -z "$TW_ACCOUNT_SID" ]; then
+            echo "TW_ACCOUNT_SID secret is not set!"
             echo "Go to Settings > Secrets > Actions and add it."
             exit 1
           else
-            echo "MY_PASSWORD is configured"
+            echo "TW_ACCOUNT_SID is configured"
+          fi
+          
+          if [ -z "$TW_AUTH_TOKEN" ]; then
+            echo "TW_AUTH_TOKEN secret is not set!"
+            echo "Go to Settings > Secrets > Actions and add it."
+            exit 1
+          else
+            echo "TW_AUTH_TOKEN is configured"
           fi
 
+          if [ -z "$TW_FROM_NUMBER" ]; then
+            echo "TW_FROM_NUMBERsecret is not set!"
+            echo "Go to Settings > Secrets > Actions and add it."
+            exit 1
+          else
+            echo "TW_FROM_NUMBER is configured"
+          fi
+
+          if [ -z "$TW_TO_NUMBER" ]; then
+            echo "TW_TO_NUMBERsecret is not set!"
+            echo "Go to Settings > Secrets > Actions and add it."
+            exit 1
+          else
+            echo "TW_TO_NUMBER is configured"
+          fi
+          
           echo ""
           echo "All secrets are configured!"
 
