@@ -5,12 +5,12 @@ from twilio.rest import Client
 from dotenv import load_dotenv
 
 # Load .env from the same directory as this script, regardless of where it's run from
-load_dotenv(dotenv_path=Path(__file__).parent / ".env")
-try:
-    from dotenv import load_dotenv
-    load_dotenv(dotenv_path=Path(__file__).parent / ".env")
-except ImportError:
-    pass  # Not needed in GitHub Actions — secrets are already in the environment
+# load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+# try:
+#     from dotenv import load_dotenv
+#     load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+# except ImportError:
+#     pass  # Not needed in GitHub Actions — secrets are already in the environment
     
 api_key = os.getenv("OWM_API_KEY")
 own_endpoint= "https://api.openweathermap.org/data/2.5/forecast"
